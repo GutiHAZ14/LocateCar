@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">"LocateVehicle"</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="locationUrl"></string>
+    <string name="FindButton">Find It!</string>
+    <string name="FindCarTitle">Find the Car Location</string>
+    <string name="FindCarInformation">Enter the vehicle location code</string>
+
+</resources>
