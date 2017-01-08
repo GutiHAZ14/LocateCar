@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -89,7 +90,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         final MaterialTapTargetPrompt mFabPrompt = new MaterialTapTargetPrompt.Builder(MapsActivity.this)
                 .setTarget(findViewById(R.id.capture))
                 .setPrimaryText("A smart way to locate your vehicle")
-                .setSecondaryText("Share or Find you Vehicle\nTap the button for capture location")
+                .setSecondaryText("Share or Find your Vehicle\nTap the button to capture location")
                 .setAnimationInterpolator(new FastOutSlowInInterpolator())
                 .setOnHidePromptListener(new MaterialTapTargetPrompt.OnHidePromptListener() {
                     @Override
@@ -105,7 +106,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .create();
         mFabPrompt.show();
 
-
         // GPS Check
         final LocationManager manager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
@@ -115,24 +115,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        // code for long clicking the map displays a floating instruction menu
-        //final FloatingActionsMenu menuCar = (FloatingActionsMenu) findViewById(R.id.multiple_actions);
-
-        //menuCar.setOnLongClickListener(new View.OnLongClickListener() {
-        //  @Override
-        //public boolean onLongClick(View view) {
-        //  mFabPrompt.show();
-        //return true;
-        //}
-        //});
-
-
         // Floating Menu
         final FloatingActionButton captureCar = (FloatingActionButton) findViewById(R.id.capture);
         captureCar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                captureCar.setTitle("Capture Car Location");
+                captureCar.setTitle("Capture");
                 captureCarLocation();
             }
         });
@@ -141,7 +129,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         shareLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                shareLocation.setTitle("Share Car Location");
+                shareLocation.setTitle("Share");
                 shareIt();
             }
         });
@@ -156,7 +144,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         findCar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                findCar.setTitle("Find the Car Location");
+                findCar.setTitle("Find the vehicle Location");
                 findCarLocation();
             }
         });
@@ -192,7 +180,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .customView(R.layout.dialog_findcar, true)
                 .positiveText(R.string.FindButton)
                 .negativeText(android.R.string.cancel)
-                .onPositive(new MaterialDialog.SingleButtonCallback() {
+                .onPositive(
+                        new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         final Intent intent = new Intent(Intent.ACTION_VIEW,
@@ -205,6 +194,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         findAction = dialog.getActionButton(DialogAction.POSITIVE);
         //noinspection ConstantConditions
         locationUrl = (EditText) dialog.getCustomView().findViewById(R.id.locationurl);
+
         sharedpreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         if((sharedpreferences.getString("shorturl","default") != null) &&
                 (sharedpreferences.getString("shorturl","default") != "default")) {
@@ -546,6 +536,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                 startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+
+            }
+        });
+
+        builder.onNegative(new MaterialDialog.SingleButtonCallback() {
+            @Override
+            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                dialog.dismiss();
+                finish();
+            }
+        });
+
+        MaterialDialog dialog = builder.build();
+        dialog.show();
+    }
+    @Override
+    public void onBackPressed() {
+        buildAlertMessageOffGps();
+    }
+
+    private void buildAlertMessageOffGps() {
+
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(this)
+                .title("GPS Check!")
+                .content("Please Disable GPS & Save Battery!")
+                .positiveText("Disable")
+                .negativeText("Dismiss");
+
+        builder.onPositive(new MaterialDialog.SingleButtonCallback() {
+            @Override
+            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+
             }
         });
 

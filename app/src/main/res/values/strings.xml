@@ -6,7 +6,7 @@
     <string name="action_settings">Settings</string>
     <string name="locationUrl"></string>
     <string name="FindButton">Find It!</string>
-    <string name="FindCarTitle">Find the Car Location</string>
+    <string name="FindCarTitle">Find the Vehicle Location</string>
     <string name="FindCarInformation">Enter the vehicle location code</string>
 
 </resources>
